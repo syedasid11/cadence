@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { signUp } from "@/services/authService";
+import { TextInputField } from "@/components/ui/TextInputField";
+import { colors, radius, spacing, typography } from "@/constants/theme";
 
 export default function SignupScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   async function handleSignup() {
-    console.log("Signup button pressed");
-
     if (!email.trim() || !password.trim()) {
       Alert.alert("Missing fields", "Please enter email and password.");
       return;
@@ -23,7 +23,6 @@ export default function SignupScreen() {
     const { data, error } = await signUp(email.trim(), password);
 
     if (error) {
-      console.log("Signup error:", error.message);
       Alert.alert("Signup failed", error.message);
       return;
     }
@@ -39,63 +38,90 @@ export default function SignupScreen() {
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", padding: 24, backgroundColor: "#fff" }}>
-      <Text style={{ fontSize: 32, fontWeight: "700", marginBottom: 12 }}>
-        Create Account
-      </Text>
+    <View style={styles.screen}>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>
+            Start building your rhythm with Cadence.
+          </Text>
+        </View>
 
-      <Text style={{ marginBottom: 24 }}>
-        Start building your rhythm with Cadence.
-      </Text>
+        <View style={styles.form}>
+          <TextInputField
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <View style={styles.inputGap} />
+          <TextInputField
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <View style={styles.buttonGap} />
 
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        style={{
-          borderWidth: 1,
-          borderColor: "#ddd",
-          borderRadius: 12,
-          padding: 14,
-          marginBottom: 12,
-        }}
-      />
+          <Pressable style={styles.primaryButton} onPress={handleSignup}>
+            <Text style={styles.primaryButtonText}>Sign up</Text>
+          </Pressable>
+        </View>
 
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={{
-          borderWidth: 1,
-          borderColor: "#ddd",
-          borderRadius: 12,
-          padding: 14,
-          marginBottom: 20,
-        }}
-      />
-
-      <Pressable
-        onPress={handleSignup}
-        style={{
-          backgroundColor: "#6C63FF",
-          padding: 16,
-          borderRadius: 12,
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ color: "white", fontWeight: "700" }}>
-          Sign Up
-        </Text>
-      </Pressable>
-
-      <Pressable onPress={() => router.push("/login")}>
-        <Text style={{ textAlign: "center", marginTop: 20 }}>
-          Already have an account? Log in
-        </Text>
-      </Pressable>
+        <Pressable onPress={() => router.push("/login")}>
+          <Text style={styles.loginLink}>Already have an account? Log in</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.lg,
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    gap: spacing.xl,
+  },
+  header: {
+    gap: spacing.sm,
+  },
+  title: {
+    ...typography.screenTitle,
+    color: colors.ink,
+  },
+  subtitle: {
+    ...typography.body,
+    color: colors.mutedText,
+  },
+  form: {
+    gap: 0,
+  },
+  inputGap: {
+    height: spacing.sm,
+  },
+  buttonGap: {
+    height: spacing.md,
+  },
+  primaryButton: {
+    backgroundColor: colors.ink,
+    borderRadius: radius.md,
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+  primaryButtonText: {
+    color: colors.surface,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  loginLink: {
+    ...typography.body,
+    color: colors.mutedText,
+    textAlign: "center",
+  },
+});
